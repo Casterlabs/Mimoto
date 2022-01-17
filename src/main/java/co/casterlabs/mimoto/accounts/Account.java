@@ -158,7 +158,7 @@ public class Account {
 
         jongo
             .getCollection("accounts")
-            .update("{ accountId: #}", this.accountId)
+            .update("{ accountId: # }", this.accountId)
             .upsert()
             .with(this);
     }
@@ -186,7 +186,7 @@ public class Account {
 
         return jongo
             .getCollection("accounts")
-            .findOne("{ accountId: #}", id)
+            .findOne("{ accountId: # }", id)
             .as(Account.class);
     }
 
@@ -195,7 +195,7 @@ public class Account {
 
         return jongo
             .getCollection("accounts")
-            .findOne("{ email: #}", email.toLowerCase())
+            .findOne("{ email: # }", email.toLowerCase())
             .as(Account.class);
     }
 
