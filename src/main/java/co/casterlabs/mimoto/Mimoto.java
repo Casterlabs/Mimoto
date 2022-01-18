@@ -10,15 +10,24 @@ import org.jongo.Jongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
+import co.casterlabs.apiutil.web.ApiException;
+import co.casterlabs.mimoto.accounts.Account;
 import co.casterlabs.mimoto.preprocess.MimotoPreProcessor;
 import co.casterlabs.mimoto.routes.RouteAccount;
 import co.casterlabs.mimoto.routes.RouteAuthentication;
 import co.casterlabs.mimoto.session.SessionUtil;
 import co.casterlabs.mimoto.util.FileUtil;
+import co.casterlabs.mimoto.util.HtmlUtil;
+import co.casterlabs.mimoto.util.Quotes;
+import co.casterlabs.mimoto.util.Quotes.Quote;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.sora.Sora;
 import co.casterlabs.sora.api.PluginImplementation;
 import co.casterlabs.sora.api.SoraPlugin;
+import co.casterlabs.zohoapijava.ZohoAuth;
+import co.casterlabs.zohoapijava.requests.ZohoMailGetUserAccountDetailsRequest;
+import co.casterlabs.zohoapijava.requests.ZohoMailSendEmailRequest;
+import co.casterlabs.zohoapijava.types.ZohoUserAccount;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -32,10 +41,19 @@ public class Mimoto extends SoraPlugin {
     private Map<String, Jongo> jongoCache = new HashMap<>();
     private MongoClient mongo;
 
+    private String passwordResetEmailTemplate;
+    private String emailVerificationEmailTemplate;
+
+    private ZohoAuth zohoAuth;
+    private ZohoUserAccount zohoAccount;
+
     @SneakyThrows
     @Override
     public void onInit(Sora sora) {
         instance = this;
+
+        this.passwordResetEmailTemplate = FileUtil.loadResource("passwordreset.html");
+        this.emailVerificationEmailTemplate = FileUtil.loadResource("signup.html");
 
         String configContents = FileUtil.read(new File("plugins/Mimoto/config.json"));
         MimotoConfig config = Rson.DEFAULT.fromJson(configContents, MimotoConfig.class);
@@ -45,13 +63,17 @@ public class Mimoto extends SoraPlugin {
 
         SessionUtil.setApiJongo(this.getJongoForDatabase("api"));
 
+        // Setup Zoho
+        this.zohoAuth = new ZohoAuth(config.getZohoRefreshToken(), config.getZohoClientId(), config.getZohoClientSecret(), config.getZohoRedirectUri(), config.getZohoScope());
+        this.zohoAccount = new ZohoMailGetUserAccountDetailsRequest(this.zohoAuth).send().get(0);
+
         sora.addHttpProvider(this, new RouteAuthentication());
         sora.addHttpProvider(this, new RouteAccount());
         sora.registerHttpPreProcessor(this, MimotoPreProcessor.ID, new MimotoPreProcessor());
     }
 
     @SuppressWarnings("deprecation")
-    public Jongo getJongoForDatabase(String databaseName) {
+    public Jongo getJongoForDatabase(@NonNull String databaseName) {
         Jongo jongo = this.jongoCache.get(databaseName);
 
         if (jongo == null) {
@@ -61,6 +83,39 @@ public class Mimoto extends SoraPlugin {
         }
 
         return jongo;
+    }
+
+    public void sendEmail(@NonNull String content, @NonNull String subject, @NonNull String email) {
+        try {
+            new ZohoMailSendEmailRequest(this.zohoAuth)
+                .setAccountId(this.zohoAccount.getAccountId())
+                .setContentsAsHtml(content)
+                .setFromAddress(this.zohoAccount.getPrimaryEmailAddress())
+                .setToAddress(email)
+                .setSubject(subject)
+                .send();
+        } catch (ApiException e) {
+            this.getLogger().exception(e);
+        }
+    }
+
+    public String formatEmailVerificationEmail(@NonNull Account account, @NonNull String emailVerifyId) {
+        Quote quote = Quotes.randomQuote();
+
+        return this.emailVerificationEmailTemplate
+            .replace("%account.name%", HtmlUtil.escapeHtml(account.getName()))
+            .replace("%link%", String.format("https://casterlabs.co/account/verify?id=%s", HtmlUtil.encodeURIComponent(emailVerifyId)))
+            .replace("%quote%", quote.getQuote())
+            .replace("%quote.author%", quote.getAuthor());
+    }
+
+    public String formatPasswordResetEmail(@NonNull Account account, @NonNull String passwordResetId) {
+        Quote quote = Quotes.randomQuote();
+
+        return this.passwordResetEmailTemplate
+            .replace("%link%", String.format("https://casterlabs.co/account/resetpassword?id=%s", HtmlUtil.encodeURIComponent(passwordResetId)))
+            .replace("%quote%", quote.getQuote())
+            .replace("%quote.author%", quote.getAuthor());
     }
 
     @Override

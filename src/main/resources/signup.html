@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro&display=swap" />
+        <style>
+            html {
+                height: 100%;
+            }
+
+            body {
+                font-family: "Be Vietnam Pro", sans-serif;
+                margin: auto;
+            }
+
+            section {
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+
+            h1 {
+                font-size: 2.25rem;
+                font-weight: bold;
+            }
+
+            p {
+                font-size: 1.25rem;
+            }
+
+            .round-button {
+                line-height: 1.5em;
+                font-size: 1.1em;
+                font-weight: bold;
+                width: 185px;
+                display: block;
+                text-align: center;
+                border-radius: 50px;
+                padding: 15px;
+                background-color: #f5f5f5;
+                color: #ea4c4c;
+                text-decoration: none;
+                border: 1px solid #ccc;
+                cursor: pointer;
+            }
+
+            .welcome-wagon {
+                background-color: black;
+                color: white;
+                height: 100%;
+                display: block;
+                background: linear-gradient(to bottom, #ea4c4c 0%, #ac3939 100%);
+            }
+
+            .footer {
+                background-color: #f1f1f1;
+                text-align: center;
+            }
+
+            .footer blockquote {
+                font-size: 1.25em;
+            }
+
+            .footer img {
+                display: block;
+                margin: auto;
+            }
+        </style>
+    </head>
+
+    <body>
+        <table border="0" cellspacing="0" width="100%">
+            <tr>
+                <td></td>
+                <td width="700">
+                    <section class="welcome-wagon">
+                        <br />
+                        <h1>Howdy, %account.name%!</h1>
+                        <p>
+                            Welcome to Casterlabs, your friendly neighborhood stream widgets service. Click the button below to create your account and get started.
+                        </p>
+                        <br />
+                        <br />
+                        <font color="#ea4c4c">
+                            <a href="%link%" target="_blank" class="round-button">
+                                Create Account
+                            </a>
+                        </font>
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                    </section>
+                    <section class="footer">
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <blockquote>
+                            &ldquo;%quote%&rdquo;<br />&mdash; %quote.author%
+                        </blockquote>
+                        <br />
+                        <img src="https://cdn.casterlabs.co/email/banner_black.png" />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                    </section>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </body>
+
+</html>

@@ -51,9 +51,9 @@ public class Account {
     private String emailVerificationId = "";
 
     @Nullable
-    private String resetRequestId = "";
+    private String passwordResetRequestId = "";
 
-    private long resetRequestTimestamp = 0;
+    private long passwordResetRequestTimestamp = 0;
 
     /* ---------------- */
 
@@ -66,20 +66,19 @@ public class Account {
             this.emailVerificationId = new String(CryptoUtil.generateSecureRandomKey());
             this.save();
 
-            // TODO Fire off the email.
-            System.out.println("VERIFY EMAIL!");
-
+            String emailTemplate = Mimoto.getInstance().formatEmailVerificationEmail(this, this.accountId + ':' + this.emailVerificationId);
+            Mimoto.getInstance().sendEmail(emailTemplate, "Email Verification", this.email);
         }
     }
 
     public void initiatePasswordReset() {
-        this.resetRequestId = new String(CryptoUtil.generateSecureRandomKey());
-        this.resetRequestTimestamp = System.currentTimeMillis();
+        this.passwordResetRequestId = new String(CryptoUtil.generateSecureRandomKey());
+        this.passwordResetRequestTimestamp = System.currentTimeMillis();
 
         this.save();
 
-        // TODO Fire off the email.
-        System.out.println("RESET PASSWORD!");
+        String emailTemplate = Mimoto.getInstance().formatPasswordResetEmail(this, this.accountId + ':' + this.passwordResetRequestId);
+        Mimoto.getInstance().sendEmail(emailTemplate, "Password Reset Request", this.email);
     }
 
     /**
@@ -100,17 +99,17 @@ public class Account {
      * @return an error message, or null if success.
      */
     public @Nullable String tryResetPassword(@NonNull String id, @NonNull String newPassword) {
-        if ((System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(15)) > this.resetRequestTimestamp) {
+        if ((System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(15)) > this.passwordResetRequestTimestamp) {
             return "RESET_ID_EXPIRED";
         }
 
-        if (!id.equals(this.resetRequestId)) {
+        if (!id.equals(this.passwordResetRequestId)) {
             return "RESET_ID_INVALID";
         }
 
         this.passwordHash = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-        this.resetRequestId = "";
-        this.resetRequestTimestamp = 0;
+        this.passwordResetRequestId = "";
+        this.passwordResetRequestTimestamp = 0;
 
         this.save();
 

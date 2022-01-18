@@ -8,4 +8,10 @@ import lombok.Getter;
 public class MimotoConfig {
     private String mongoUri;
 
+    private String zohoScope;
+    private String zohoRefreshToken;
+    private String zohoClientId;
+    private String zohoClientSecret;
+    private String zohoRedirectUri;
+
 }
