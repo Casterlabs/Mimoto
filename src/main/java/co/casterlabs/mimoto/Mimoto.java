@@ -7,6 +7,8 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.jongo.Jongo;
 
+import com.backblaze.b2.client.B2StorageClient;
+import com.backblaze.b2.client.B2StorageClientFactory;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
@@ -47,6 +49,8 @@ public class Mimoto extends SoraPlugin {
     private ZohoAuth zohoAuth;
     private ZohoUserAccount zohoAccount;
 
+    private @Getter B2StorageClient b2;
+
     @SneakyThrows
     @Override
     public void onInit(Sora sora) {
@@ -57,6 +61,11 @@ public class Mimoto extends SoraPlugin {
 
         String configContents = FileUtil.read(new File("plugins/Mimoto/config.json"));
         MimotoConfig config = Rson.DEFAULT.fromJson(configContents, MimotoConfig.class);
+
+        // Connect to Backblaze
+        this.b2 = B2StorageClientFactory
+            .createDefaultFactory()
+            .create(config.getB2Id(), config.getB2Key(), "Mimoto");
 
         // Connect to Mongo
         this.mongo = new MongoClient(new MongoClientURI(config.getMongoUri()));
@@ -121,6 +130,7 @@ public class Mimoto extends SoraPlugin {
     @Override
     public void onClose() {
         this.mongo.close();
+        this.b2.close();
         this.jongoCache = null;
     }
 

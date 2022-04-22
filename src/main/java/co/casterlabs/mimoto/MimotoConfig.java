@@ -14,4 +14,7 @@ public class MimotoConfig {
     private String zohoClientSecret;
     private String zohoRedirectUri;
 
+    private String b2Id;
+    private String b2Key;
+
 }
