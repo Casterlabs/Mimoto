@@ -43,6 +43,9 @@ public class Account {
     private boolean isBanned = false;
 
     @JsonField
+    private boolean hasCasterlabsPlus = false;
+
+    @JsonField
     private long creationTimestamp;  // Cannot be changed.
 
     /* Verification */
