@@ -19,16 +19,22 @@ import lombok.Setter;
 
 public class SessionUtil {
     private static final JsonArray EMPTY_ARRAY = new JsonArray();
-
     private static final long MAX_QPS = 15;
 
     private static @Setter Jongo apiJongo;
 
     public static SessionMeta getSessionMeta(@NonNull HttpSession session, boolean countTowardsRateLimit) throws DropConnectionException {
-        String ip = session.getHeader("x-remote-ip");
+        String ip = session.getRemoteIpAddress();
 
         if (ip == null) {
-            ip = session.getRemoteIpAddress();
+            ip = "0.0.0.0";
+            session
+                .getLogger()
+                .severe(
+                    "Unable to get an ip address for a http session, raw response: %s, %s",
+                    session.getRemoteIpAddress(),
+                    session.getRequestHops()
+                );
         }
 
         return getSessionMeta(ip, countTowardsRateLimit);
@@ -38,7 +44,7 @@ public class SessionUtil {
         long current = System.currentTimeMillis();
 
         // Insert the request.
-        if (countTowardsRateLimit) {
+        if (countTowardsRateLimit && !ip.equals("0.0.0.0")) {
             Date expiresAt = new Date(current + TimeUnit.SECONDS.toMillis(1));
 
             apiJongo
