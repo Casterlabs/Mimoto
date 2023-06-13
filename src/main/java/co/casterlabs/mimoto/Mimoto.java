@@ -76,9 +76,9 @@ public class Mimoto extends SoraPlugin {
         this.zohoAuth = new ZohoAuth(config.getZohoRefreshToken(), config.getZohoClientId(), config.getZohoClientSecret(), config.getZohoRedirectUri(), config.getZohoScope());
         this.zohoAccount = new ZohoMailGetUserAccountDetailsRequest(this.zohoAuth).send().get(0);
 
-        sora.addHttpProvider(this, new RouteAuthentication());
-        sora.addHttpProvider(this, new RouteAccount());
-        sora.registerHttpPreProcessor(this, MimotoPreProcessor.ID, new MimotoPreProcessor());
+        sora.addProvider(this, new RouteAuthentication());
+        sora.addProvider(this, new RouteAccount());
+        sora.registerPreProcessor(this, MimotoPreProcessor.ID, new MimotoPreProcessor());
     }
 
     @SuppressWarnings("deprecation")
