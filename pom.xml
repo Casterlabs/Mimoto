@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>co.casterlabs</groupId>
 	<artifactId>Mimoto</artifactId>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -84,9 +84,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.casterlabs</groupId>
-			<artifactId>Sora</artifactId>
-			<version>2.8.3</version>
+			<groupId>co.casterlabs.Sora</groupId>
+			<artifactId>Sora-Api</artifactId>
+			<version>2.12.0</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -131,7 +131,7 @@
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>4.6.0</version>
+			<version>4.10.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

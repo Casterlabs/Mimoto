@@ -6,11 +6,11 @@ import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.Nullable;
 import org.jongo.Jongo;
 
-import co.casterlabs.rakurai.io.http.DropConnectionException;
-import co.casterlabs.rakurai.io.http.HttpResponse;
-import co.casterlabs.rakurai.io.http.HttpSession;
 import co.casterlabs.rakurai.io.http.HttpStatus;
 import co.casterlabs.rakurai.io.http.StandardHttpStatus;
+import co.casterlabs.rakurai.io.http.server.DropConnectionException;
+import co.casterlabs.rakurai.io.http.server.HttpResponse;
+import co.casterlabs.rakurai.io.http.server.HttpSession;
 import co.casterlabs.rakurai.json.element.JsonArray;
 import co.casterlabs.rakurai.json.element.JsonNull;
 import co.casterlabs.rakurai.json.element.JsonObject;
@@ -104,7 +104,7 @@ public class SessionUtil {
 
     public static HttpResponse create(@Nullable SessionMeta meta, @NonNull HttpStatus status, @Nullable String note, @NonNull String... errors) {
         JsonObject payload = new JsonObject();
-        JsonArray array = new JsonArray(errors);
+        JsonArray array = JsonArray.of((Object[]) errors);
 
         payload.put("data", JsonNull.INSTANCE);
         payload.put("errors", array);
